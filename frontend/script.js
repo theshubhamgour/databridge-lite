@@ -1,4 +1,5 @@
-const API_URL = 'http://localhost:3000';
+const hostname = window.location.hostname;
+const API_URL = `http://${hostname}:3000`;
 
 const messageInput = document.getElementById('messageInput');
 const submitBtn = document.getElementById('submitBtn');
