@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataBridge Lite | Modern Data Hub</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <main class="app-container">
+        <header>
+            <div class="logo">
+                <span class="logo-icon">🔗</span>
+                <h1>DataBridge <span>Lite</span></h1>
+            </div>
+            <p class="subtitle">Securely bridge your data between tiers</p>
+        </header>
+
+        <section class="card glass-effect">
+            <div class="input-group">
+                <label for="messageInput">Push new data to MySQL</label>
+                <div class="action-row">
+                    <input type="text" id="messageInput" placeholder="Enter your message here..." autocomplete="off">
+                    <button id="submitBtn" class="btn btn-primary">
+                        <span class="btn-text">Submit</span>
+                        <div class="btn-loader"></div>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="control-section">
+            <button id="fetchBtn" class="btn btn-outline">
+                <span>🔄 Fetch All Data</span>
+            </button>
+        </section>
+
+        <section id="resultsContainer" class="results-container">
+            <!-- Data will be injected here -->
+            <div class="empty-state">
+                <p>No data retrieved yet. Click "Fetch All Data" to connect to the backend.</p>
+            </div>
+        </section>
+
+        <footer class="app-footer">
+            <p>Connects to Node.js Backend ↔ MySQL Database</p>
+        </footer>
+    </main>
+
+    <div id="toast" class="toast">Message submitted successfully!</div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
