@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: databridge-backend-deployment
+  namespace: databridge-namespace
+  labels:
+    app: backend
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        # Update this to your actual backend image repository/tag
+        image: databridge-lite-backend:latest
+        env:
+        - name: DB_HOST
+          value: "mysql" # Matches the service name in mysql-deployment.yaml
+        - name: DB_USER
+          value: "root"
+        - name: DB_PASSWORD
+          value: "root"
+        - name: DB_NAME
+          value: "appdb"
+        ports:
+        - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: databridge-namespace
+spec:
+  # Using NodePort so the API can be hit from outside the cluster on EC2 instances
+  type: NodePort
+  selector:
+    app: backend
+  ports:
+  - port: 3000
+    targetPort: 3000
+    nodePort: 30000 # The browser will need to hit this port (or whatever AWS maps it to)
