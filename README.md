@@ -1,63 +1,115 @@
-# DataBridge Lite: Local Setup & Running Guide 🔗
+# DataBridge Lite: Setup & Running Guide 🚀
 
-This document explains how to set up and run the **DataBridge Lite** application on your local machine.
-
----
-
-## 🏃 Method 1: Docker (Fastest & Easiest)
-Use this method if you have Docker installed. It will automatically set up the Frontend, Backend, and MySQL.
-
-1.  **Open your terminal.**
-2.  **Navigate to the project directory:**
-    ```bash
-    cd databridge-lite
-    ```
-3.  **Build and run the containers:**
-    ```bash
-    docker compose up --build -d
-    ```
-4.  **Access the Application:**
-    - **Frontend**: [http://localhost:8080](http://localhost:8080)
-    - **Backend API**: [http://localhost:3000](http://localhost:3000)
+DataBridge Lite is a modern 3-tier application designed to demonstrate seamless connectivity between a **Frontend**, **Backend**, and **Database**.
 
 ---
 
-## 🚀 Method 2: Zero-Config Local Run (Recommended if Docker fails)
-Use this method for instant setup without needing Docker or a MySQL installation. The app will automatically use a local SQLite database.
+## 🛠 Method 1: Local Development (npm)
+Perfect for quick testing and development. The backend is designed to be "zero-config" and will automatically fallback to **SQLite** if a MySQL instance is not detected.
 
-1.  **Open your terminal.**
-2.  **Navigate to the backend folder:**
-    ```bash
-    cd databridge-lite/backend
-    ```
-3.  **Install dependencies and start:**
-    ```bash
-    npm install && npm start
-    ```
-4.  **Open the Frontend:**
-    Open `databridge-lite/frontend/index.html` in your browser.
+### 1. Backend Setup
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the server:
+   ```bash
+   npm start
+   ```
+   *The server will run on [http://localhost:3000](http://localhost:3000)*
 
----
-
-## 🛠 Method 3: Manual MySQL Setup (Advanced)
-Use this method if you want to run specifically against a local MySQL instance.
-
-### 1. Database Setup (MySQL)
-- Install MySQL, create `appdb`, and import `db/init.sql`.
-
-### 2. Backend Setup
-- In `backend`, run `npm install` and `npm start`.
-- *Note: If MySQL isn't detected, it will automatically fall back to SQLite.*
-
-### 3. Frontend Setup
-- Open `frontend/index.html` or use `npx serve frontend`.
+### 2. Frontend Setup
+1. **Option A (Simplest):** Just open `frontend/index.html` in your web browser.
+2. **Option B (Recommended):** Use a local development server for a better experience. From the **root directory**, run:
+   ```bash
+   npx serve frontend
+   ```
+   *Note: If you are already inside the `frontend` folder, run `npx serve .` instead.*
 
 ---
 
-## 🏗 Project Overview
-- **Structure**: 3-Tier (Frontend ↔ Backend ↔ Database)
-- **Tech Stack**: HTML/CSS/JS, Node.js (Express), MySQL.
-- **Port 8080**: Frontend (Web UI)
-- **Port 3000**: Backend (API)
-- **Port 3307**: MySQL (Database - External)
-- **Port 3306**: MySQL (Database - Internal Container Port)
+## 🐳 Method 2: Individual Docker Containers
+Use this method to learn how to build images and link containers manually.
+
+### 1. Create Private Network & Named Volume
+```bash
+docker network create databridge-net
+docker volume create databridge-db-vol
+```
+
+### 2. Build and Run Database
+```bash
+docker build -t databridge-db ./db
+docker run -d --name mysql-db \
+  --network databridge-net \
+  -v databridge-db-vol:/var/lib/mysql \
+  databridge-db
+```
+
+### 3. Build and Run Backend
+```bash
+docker build -t databridge-backend ./backend
+docker run -d --name api-server --network databridge-net -p 3000:3000 \
+  -e DB_HOST=mysql-db \
+  -e DB_USER=root \
+  -e DB_PASSWORD=root \
+  -e DB_NAME=appdb \
+  databridge-backend
+```
+
+### 4. Build and Run Frontend
+```bash
+docker build -t databridge-frontend ./frontend
+docker run -d --name web-ui --network databridge-net -p 8080:80 databridge-frontend
+```
+
+---
+
+## 🏗 Method 3: Docker Compose (Recommended)
+The most efficient way to orchestrate all services with a single command.
+
+1. Ensure you are in the root directory:
+   ```bash
+   docker compose up --build -d
+   ```
+
+2. To stop everything:
+   ```bash
+   docker compose down
+   ```
+
+---
+
+## 🔗 Access Ports & Health
+| Service | URL | Note |
+| :--- | :--- | :--- |
+| **Frontend** | [http://localhost:8080](http://localhost:8080) | Web Interface |
+| **Backend** | [http://localhost:3000](http://localhost:3000) | JSON API |
+
+
+---
+
+## 📁 System Architecture
+- **Frontend**: Lightweight static UI served via Nginx.
+- **Backend**: Node.js & Express logic.
+- **Database**: MySQL 8.0 with pre-configured schema.
+- **Fallbacks**: Backend auto-switches to SQLite for standalone runs.
+
+---
+
+## 🛠 Useful Docker Commands
+
+### **Management**
+- **Create Volume**: `docker volume create databridge-db-vol`
+- **Inspect Volume**: `docker volume inspect databridge-db-vol`
+- **List All Volumes**: `docker volume ls`
+- **Create Network**: `docker network create databridge-net`
+
+### **Cleanup**
+- **Stop & Remove Containers**: `docker compose down`
+- **Remove Everything (Volume included)**: `docker compose down -v`
+- **Remove Specific Volume**: `docker volume rm databridge-db-vol`

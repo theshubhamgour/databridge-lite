@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataBridge Lite | Architecture Diagram</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --accent-primary: #38bdf8;
+            --accent-secondary: #818cf8;
+            --accent-success: #34d399;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(129, 140, 248, 0.05) 0%, transparent 40%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 4rem 2rem;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .header p {
+            color: var(--text-dim);
+            font-size: 1.2rem;
+            max-width: 600px;
+        }
+
+        .diagram-container {
+            width: 100%;
+            max-width: 1200px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 6rem;
+            align-items: center;
+        }
+
+        /* Layer Styles */
+        .layer {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            border-radius: 1.5rem;
+            width: 280px;
+            text-align: center;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 20px 30px -10px rgba(56, 189, 248, 0.2);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-main);
+        }
+
+        .card p {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .card .port {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.25rem 0.75rem;
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent-primary);
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* Network Bubble */
+        .network-hull {
+            position: absolute;
+            top: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 110%;
+            height: 45%;
+            background: rgba(56, 189, 248, 0.03);
+            border: 2px dashed rgba(56, 189, 248, 0.2);
+            border-radius: 3rem;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .network-label {
+            position: absolute;
+            top: -1.5rem;
+            right: 3rem;
+            background: var(--accent-primary);
+            color: #000;
+            padding: 0.2rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 800;
+        }
+
+        /* Arrows/Lines */
+        .arrow-v {
+            position: absolute;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--accent-primary), var(--accent-secondary));
+            z-index: 0;
+            opacity: 0.3;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            bottom: -6rem;
+            left: 50%;
+            width: 2px;
+            height: 6rem;
+            background: linear-gradient(to bottom, var(--accent-primary), var(--accent-secondary));
+            opacity: 0.3;
+        }
+
+        .card.no-arrow::after { display: none; }
+
+        /* Animation */
+        @keyframes pulse {
+            0% { opacity: 0.3; transform: scaleY(1); }
+            50% { opacity: 0.8; transform: scaleY(1.1); }
+            100% { opacity: 0.3; transform: scaleY(1); }
+        }
+
+        .pulse-line {
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>System Architecture</h1>
+        <p>DataBridge Lite: A high-performance 3-Tier containerized application workflow.</p>
+    </div>
+
+    <div class="diagram-container">
+        
+        <!-- User Level -->
+        <div class="layer">
+            <div class="card">
+                <span class="card-icon">🌐</span>
+                <h3>Client Browser</h3>
+                <p>Modern Web UI interacting via REST API calls.</p>
+                <span class="port">URL: localhost:8080</span>
+            </div>
+        </div>
+
+        <!-- Infrastructure Bubble -->
+        <div class="network-hull">
+            <span class="network-label">DOCKER NETWORK: databridge-net</span>
+        </div>
+
+        <!-- App Level -->
+        <div class="layer">
+            <div class="card">
+                <span class="card-icon">🖼️</span>
+                <h3>Frontend</h3>
+                <p>Nginx serving static HTML/CSS/JS assets.</p>
+                <span class="port">Internal: 80 | External: 8080</span>
+            </div>
+            
+            <div class="card">
+                <span class="card-icon">⚙️</span>
+                <h3>Backend API</h3>
+                <p>Node.js Express logic with dynamic DB failover.</p>
+                <span class="port">Internal: 3000 | External: 3000</span>
+            </div>
+
+            <div class="card">
+                <span class="card-icon">🗄️</span>
+                <h3>MySQL DB</h3>
+                <p>Relational storage with pre-configured schemas.</p>
+                <span class="port" style="background: rgba(148, 163, 184, 0.1); color: var(--text-dim);">Internal Only (3306)</span>
+            </div>
+        </div>
+
+        <!-- Storage Level -->
+        <div class="layer">
+            <div class="card no-arrow" style="border-style: dashed; border-color: var(--accent-success);">
+                <span class="card-icon">💾</span>
+                <h3>Docker Volume</h3>
+                <p>Persistent storage for MySQL prevents data loss.</p>
+                <span class="port" style="background: rgba(52, 211, 153, 0.1); color: var(--accent-success);">Name: databridge-db-vol</span>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Simple script to add pulse effect to connections
+        document.querySelectorAll('.card').forEach(card => {
+            if (!card.classList.contains('no-arrow')) {
+                const line = document.createElement('div');
+                line.className = 'arrow-v pulse-line';
+                // Positioning logic would go here if we were doing dynamic SVG
+            }
+        });
+    </script>
+</body>
+</html>

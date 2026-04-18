@@ -6,10 +6,9 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: appdb
-    ports:
-      - "3307:3306"
     volumes:
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - databridge-db-vol:/var/lib/mysql
     networks:
       - databridge-network
 
@@ -43,3 +42,6 @@ services:
 networks:
   databridge-network:
     driver: bridge
+
+volumes:
+  databridge-db-vol:
