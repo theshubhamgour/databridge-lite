@@ -35,7 +35,7 @@ function setupSQLite() {
   dbType = 'sqlite';
   const dbPath = path.join(__dirname, 'database.sqlite');
   const sqliteDb = new sqlite3.Database(dbPath);
-  
+
   sqliteDb.serialize(() => {
     sqliteDb.run("CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT, content TEXT)");
   });
@@ -47,11 +47,11 @@ function setupSQLite() {
         callback = params;
         params = [];
       }
-      
+
       if (sql.trim().toUpperCase().startsWith('SELECT')) {
         sqliteDb.all(sql, params, callback);
       } else {
-        sqliteDb.run(sql, params, function(err) {
+        sqliteDb.run(sql, params, function (err) {
           if (err) return callback(err);
           callback(null, { insertId: this.lastID });
         });
@@ -84,7 +84,7 @@ initDatabase();
 // GET all data
 app.get('/data', (req, res) => {
   if (!db) return res.status(503).json({ error: 'Database not initialized' });
-  
+
   db.query('SELECT * FROM messages ORDER BY id DESC', (err, results) => {
     if (err) {
       console.error('Error fetching data:', err);
@@ -97,7 +97,7 @@ app.get('/data', (req, res) => {
 // POST new data
 app.post('/data', (req, res) => {
   if (!db) return res.status(503).json({ error: 'Database not initialized' });
-  
+
   const { content } = req.body;
   if (!content) {
     return res.status(400).json({ error: 'Content is required' });
