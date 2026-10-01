@@ -4,8 +4,10 @@ const API_URL = `http://${hostname}:3000`;
 const messageInput = document.getElementById('messageInput');
 const submitBtn = document.getElementById('submitBtn');
 const fetchBtn = document.getElementById('fetchBtn');
+const searchInput = document.getElementById('searchInput');
 const resultsContainer = document.getElementById('resultsContainer');
 const toast = document.getElementById('toast');
+let fetchedData = [];
 
 // Submit Data
 submitBtn.addEventListener('click', async () => {
@@ -42,26 +44,19 @@ submitBtn.addEventListener('click', async () => {
 
 // Fetch Data
 fetchBtn.addEventListener('click', fetchData);
+searchInput.addEventListener('input', () => renderData(searchInput.value));
 
 async function fetchData() {
     resultsContainer.innerHTML = '<div class="empty-state">Connecting to bridge...</div>';
     
     try {
         const response = await fetch(`${API_URL}/data`);
-        const data = await response.json();
-
-        if (data.length === 0) {
-            resultsContainer.innerHTML = '<div class="empty-state">Bridge is empty. Start by pushing some data.</div>';
-            return;
+        if (!response.ok) {
+            throw new Error(`Request failed with status ${response.status}`);
         }
-
-        resultsContainer.innerHTML = data.map((item, index) => `
-            <div class="data-item" style="animation-delay: ${index * 0.1}s">
-                <div class="data-id">ENTRY #${item.id}</div>
-                <div class="data-content">${escapeHTML(item.content)}</div>
-            </div>
-        `).join('');
-
+        const data = await response.json();
+        fetchedData = data;
+        renderData(searchInput.value);
     } catch (error) {
         console.error('Fetch error:', error);
         resultsContainer.innerHTML = `
@@ -71,6 +66,30 @@ async function fetchData() {
             </div>
         `;
     }
+}
+
+function renderData(searchTerm = '') {
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+    const filteredData = fetchedData.filter(item =>
+        item.content.toLowerCase().includes(normalizedSearch)
+    );
+
+    if (fetchedData.length === 0) {
+        resultsContainer.innerHTML = '<div class="empty-state">Bridge is empty. Start by pushing some data.</div>';
+        return;
+    }
+
+    if (filteredData.length === 0) {
+        resultsContainer.innerHTML = '<div class="empty-state">No messages match your search.</div>';
+        return;
+    }
+
+    resultsContainer.innerHTML = filteredData.map((item, index) => `
+            <div class="data-item" style="animation-delay: ${index * 0.1}s">
+                <div class="data-id">ENTRY #${item.id}</div>
+                <div class="data-content">${escapeHTML(item.content)}</div>
+            </div>
+        `).join('');
 }
 
 // Utilities

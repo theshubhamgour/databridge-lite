@@ -90,6 +90,9 @@ The most efficient way to orchestrate all services with a single command.
 | **Frontend** | [http://localhost:8080](http://localhost:8080) | Web Interface |
 | **Backend** | [http://localhost:3000](http://localhost:3000) | JSON API |
 
+After fetching records in the web interface, use **Search fetched messages** to filter
+the results by message content without sending another request to the backend.
+
 
 ---
 
